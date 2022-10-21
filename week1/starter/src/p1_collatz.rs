@@ -21,7 +21,7 @@ fn f(n: usize) -> usize {
 /// Run `cargo test collatz_recursive_test` to check your answer.
 pub fn collatz_recursive(n: usize) -> usize {
   if n > 1 {
-    return 1 + collatz_recursive(f(n));
+    1 + collatz_recursive(f(n))
   }
   0
 }
