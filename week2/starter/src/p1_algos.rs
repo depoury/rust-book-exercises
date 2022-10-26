@@ -11,7 +11,8 @@
 ///
 /// Run `cargo test insort` to check your answers.
 pub fn insort(v: &mut Vec<i32>, n: i32) {
-  unimplemented!()
+  let pos = v.binary_search(&n).unwrap_or_else(|e| e);
+  v.insert(pos, n);
 }
 
 type Node = i32;
@@ -30,8 +31,20 @@ type Node = i32;
 /// to use the [`std::ptr::eq`](https://doc.rust-lang.org/std/ptr/fn.eq.html) function to implement `connected`.
 ///
 /// Run `cargo test connected` to check your answers.
+
 pub fn connected(edges: &[(&Node, &Node)], src: &Node, dst: &Node) -> bool {
-  unimplemented!()
+  // Does not handle cyclic graphs... (Could not figure out memoisation!)
+  if std::ptr::eq(src, dst) {
+    return true;
+  }
+  for edge in edges {
+    if std::ptr::eq(edge.0, src) {
+      if connected(edges, edge.1, dst) {
+        return true;
+      }
+    }
+  }
+  false
 }
 
 #[cfg(test)]

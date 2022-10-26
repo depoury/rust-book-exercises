@@ -41,15 +41,31 @@ fn round_all_test() {
 /// and returns a value:
 ///   * representing which strings in the collection contain the needle
 pub fn find_contains(
-  /* Pick and justify your parameters */
-) -> () /* Pick and justify your return type */
+  // (1) haystack could be a Vec<_>, &Vec<_>, &mut Vec<_>, &[_], or &mut[_]. I choose &[_] because
+  //     we do not need to change the size, order or elements of the collection.
+  // (2) needle is an &str because it is a particular string
+  haystack: &[&str],
+  needle: &str
+) -> Vec<String>
+  // Returns a collection of strings that contain the needle (may be empty)
 {
-  unimplemented!();
+  let mut ret: Vec<String> = vec![];
+  for &strand in haystack {
+    if strand.contains(needle) {
+      ret.push(String::from(strand));
+    }
+  }
+  ret
 }
 
 #[test]
 fn find_contains_test() {
-  /* Add your unit test here! */
+  let haystack: Vec<&str> = vec!["Hello", "World", "Bad", "Wolf"];
+  let empty_vec: Vec<&str> = vec![];
+  assert_eq!(find_contains(&haystack, "Hell"), vec!["Hello"]);
+  assert_eq!(find_contains(&haystack, "l"), vec!["Hello", "World", "Wolf"]);
+  assert_eq!(find_contains(&haystack, "a"), vec!["Bad"]);
+  assert_eq!(find_contains(&haystack, "Hello World"), empty_vec);
 }
 
 /// P2b: fill_progress_bar is a function that takes:
@@ -60,13 +76,42 @@ fn find_contains_test() {
 /// For example, at a progress of 20% with bracketed delimiters, the bar would be:
 ///   [==        ]
 pub fn fill_progress_bar(
-  /* Pick and justify your parameters */
-) -> () /* Pick and justify your return type */
+  buf: &mut String,
+  delims: &[&str; 2],
+  frac: &f32
+)
+// No return value, since this function only mutates an input.
 {
-  unimplemented!();
+  assert!(*frac >= 0.);
+  assert!(*frac <= 1.);
+  let mut ret = String::with_capacity(12);
+  let rounded_val: i8 = (*frac * 10.).round() as i8;
+  let open_delim: char = delims[0].parse().unwrap();
+  let close_delim: char = delims[1].parse().unwrap();
+  ret.push(open_delim);
+  for _ in 1..=rounded_val {
+    ret.push('=');
+  }
+  for _ in 1..=(10 - rounded_val) {
+    ret.push(' ');
+  }
+  ret.push(close_delim);
+  *buf = ret;
 }
 
 #[test]
 fn test_fill_progress_bar() {
-  /* Add your unit test here! */
+  let mut buf:String = String::new();
+  let delims_1: [&str; 2] = ["[", "]"];
+  let delims_2: [&str; 2] = ["|", "?"];
+  let frac_1: f32 = 0.3;
+  let frac_2: f32 = 0.7;
+  fill_progress_bar(&mut buf, &delims_1, &frac_1);
+  assert_eq!(buf, String::from("[===       ]"));
+  fill_progress_bar(&mut buf, &delims_2, &frac_2);
+  assert_eq!(buf, String::from("|=======   ?"));
+  fill_progress_bar(&mut buf, &delims_2, &0.99);
+  assert_eq!(buf, String::from("|==========?"));
+  fill_progress_bar(&mut buf, &delims_1, &0.02);
+  assert_eq!(buf, String::from("[          ]"));
 }
